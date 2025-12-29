@@ -99,6 +99,9 @@ def run_colmap(
     matching_method: Literal["vocab_tree", "exhaustive", "sequential"] = "vocab_tree",
     refine_intrinsics: bool = True,
     colmap_cmd: str = "colmap",
+    # [CUSTOM]
+    max_image_size: int = 3200,
+    max_num_features: int = 8192,
 ) -> None:
     """Runs COLMAP on the images.
 
@@ -112,6 +115,9 @@ def run_colmap(
         matching_method: Matching method to use.
         refine_intrinsics: If True, refine intrinsics.
         colmap_cmd: Path to the COLMAP executable.
+        [CUSTOM]
+        max_image_size(=3200): Size to downscale the input image for feature extraction
+        max_num_features(=8192): Number to limit the candidate points for subsequent processes(matching, mapper) -> speed up
     """
 
     colmap_version = get_colmap_version(colmap_cmd)
