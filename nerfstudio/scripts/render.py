@@ -212,6 +212,7 @@ def _render_trajectory_video(
                         sys.exit(1)
                     output_image = outputs[rendered_output_name]
                     is_depth = rendered_output_name.find("depth") != -1
+                    is_semantic = rendered_output_name.find("semantic") != -1
                     if is_depth:
                         output_image = (
                             colormaps.apply_depth_colormap(
@@ -226,6 +227,20 @@ def _render_trajectory_video(
                         )
                     elif rendered_output_name == "rgba":
                         output_image = output_image.detach().cpu().numpy()
+                    elif rendered_output_name == "semantics_colormap":
+                        # semantics_colormap is already RGB colored, just convert to numpy
+                        output_image = output_image.detach().cpu().numpy()
+                    elif rendered_output_name == "semantics":
+                        # Raw semantic logits - convert to class predictions and colormap
+                        # This creates a visualization using colormap over argmax of logits
+                        pred_labels = torch.argmax(torch.softmax(output_image, dim=-1), dim=-1)
+                        # Use a simple colormap for visualization
+                        num_classes = output_image.shape[-1]
+                        # Generate distinct colors for each class
+                        import matplotlib.pyplot as plt
+                        cmap = plt.get_cmap("tab20")
+                        colors = torch.tensor([cmap(i % 20)[:3] for i in range(num_classes)], device=pred_labels.device, dtype=torch.float32)
+                        output_image = colors[pred_labels].cpu().numpy()
                     else:
                         output_image = (
                             colormaps.apply_colormap(

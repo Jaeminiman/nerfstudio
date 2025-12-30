@@ -34,8 +34,8 @@ class SemanticDataset(InputDataset):
 
     exclude_batch_keys_from_device = InputDataset.exclude_batch_keys_from_device + ["mask", "semantics"]
 
-    def __init__(self, dataparser_outputs: DataparserOutputs, scale_factor: float = 1.0):
-        super().__init__(dataparser_outputs, scale_factor)
+    def __init__(self, dataparser_outputs: DataparserOutputs, scale_factor: float = 1.0, cache_compressed_images: bool = False):
+        super().__init__(dataparser_outputs, scale_factor, cache_compressed_images)
         assert "semantics" in dataparser_outputs.metadata.keys() and isinstance(self.metadata["semantics"], Semantics)
         self.semantics = self.metadata["semantics"]
         self.mask_indices = torch.tensor(
